@@ -1,3 +1,3 @@
-import scraping
+from scraper2 import *
 
-scraping.start("keyword", "path")
+scraping("keyword")
