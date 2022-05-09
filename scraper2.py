@@ -2,17 +2,21 @@ from scraper import *
    
 def scraping(keyword):
 
-    scraping = scraper()
+    koUrl = ("https://pixabay.com/ko/", "https://www.pexels.com/ko-kr/")
+    enUrl = ("https://pixabay.com/en/", "https://www.pexels.com/en/", "https://unsplash.com/")
 
-    koUrl = ("https://pixabay.com/ko/", "https://pixabay.com/ko/")
-    enUrl = ("https://pixabay.com/en/", "https://pixabay.com/en/", "https://unsplash.com/")
+    scraping = scraper(4)
+
+    num = 0
 
     if 'a' <= keyword[0] <= "z" or 'A' <= keyword[0] <='Z':
 
         for Url in enUrl:
-            scraping.english_find(Url, keyword)
+            scraping.english_find(Url, keyword,num)
+            num = num+1
 
     else:
         
         for Url in koUrl:
-            scraping.korean_find(Url, keyword)
+            scraping.korean_find(Url, keyword,num)
+            num = num+1
