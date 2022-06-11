@@ -1,25 +1,33 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 import tkinter
 from tkinter import filedialog
+import time
+import urllib.request
 import os
+import time
+
+
+# 실행 코드
+
+
 
 class function():
-    def download_img(self):
-        images = driver.find_elements_by_css_selector(".link--h3bPW")
-        count = 0
-        for image in images:
-            if count == self.limit:
-                break
+    def download_img(self, image, count):
+        self.image = image
+        self.limit = int(limit)
+
+        for num in range(0, self.limit):
+
             try:
-                image.click()
-                time.sleep(2)
-                imgUrl = driver.find_element_by_css_selector(".n3VNCb").get_attribute("src")
+                imgUrl = self.image[num]
                 opener=urllib.request.build_opener()
-                opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
+                opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36')]
                 urllib.request.install_opener(opener)
-                urllib.request.urlretrieve(imgUrl,self.path + "/" + self.keyWords + str(count+1) + ".jpg")
-                count = count + 1
+                urllib.request.urlretrieve(imgUrl,selected_folder + "/" + str(count)+ keyword + str(num) + ".jpg")
+                # urllib.request.urlretrieve(imgUrl, str(num) + ".jpg")
             except:
                 pass
 
@@ -27,59 +35,154 @@ class function():
 class scraper(function):
     def __init__(self,num):
         options = webdriver.ChromeOptions()
-        # options.add_argument('user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36')
-        # options.add_argument('--ignore-certificate-errors')
-        # options.add_argument('--ignore-ssl-errors')
-        # options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        # options.add_experimental_option("prefs", {"download.default_directory": self.path})
-        # options.add_argument('headless')
+        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36")
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        options.add_experimental_option("prefs", {"download.default_directory": selected_folder})
+        options.add_argument('headless')
         options.add_argument('disable-gpu') 
         self.driver = []
         for i in range(0 , num):
-            self.driver.append(webdriver.Chrome("chromedriver.exe", options=options))
+            self.driver.append(webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options))
 
 
     def english_find(self, Url, keyword, num):
         self.num = num
-        self.keyword = keyword
+        keyword = keyword
         self.driver[self.num].get(Url)
+
+        SCROLL_PAUSE_TIME = 1
+        # Get scroll height
+        last_height = self.driver[self.num].execute_script("return document.body.scrollHeight")
+        t = 0
+
+        while t <= 2:
+            # Scroll down to bottom
+            self.driver[self.num].execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            # Wait to load page
+            time.sleep(SCROLL_PAUSE_TIME)
+            # Calculate new scroll height and compare with last scroll height
+            new_height = self.driver[self.num].execute_script("return document.body.scrollHeight")
+            last_height = new_height
+            t += 1
+
+        img = []
+        img.clear()
         try:
-            elem1 = self.driver[self.num].find_element_by_id("search")
-            elem1.send_keys(self.keyword)
-            elem1.send_keys(Keys.RETURN)
+            image1 = self.driver[self.num].find_elements_by_css_selector("a.link--h3bPW > img")
+
+            if image1 == []:
+                raise Exception()
+
+            for num in range(0 , len(image1)):
+                img.append(image1[num].get_attribute("src"))
+            function().download_img(img, self.num)
+            self.driver[self.num].close()
+            return
         except:
             pass
         try:
-            elem2 = self.driver[self.num].find_element_by_name("q")
-            elem2.send_keys(self.keyword)
-            elem2.send_keys(Keys.RETURN)
+            image3 = self.driver[self.num].find_elements_by_css_selector("div.VQW0y > img")
+
+            if image3 == []:
+                raise Exception()
+
+            for num in range(0 , len(image3)):
+                img.append(image3[num].get_attribute("src"))
+            function().download_img(img, self.num)
+            self.driver[self.num].close()
+            return
         except:
             pass
+
         try:
-            elem3 = self.driver[self.num].find_element_by_name("searchKeyword")
-            elem3.send_keys(self.keyword)
-            elem3.send_keys(Keys.RETURN)
+            image2 = self.driver[self.num].find_elements_by_css_selector("a.Link_link__mTUkz > img")
+
+            if image2 == []:
+                raise Exception()
+
+            for num in range(0 , len(image2)):
+                img.append(image2[num].get_attribute("src"))
+            function().download_img(img, self.num)
+            self.driver[self.num].close()
+            return
         except:
             pass
+        
         
     def korean_find(self, Url, keyword, num):
         self.num = num
-        # self.keyword = keyword
+        keyword = keyword
         self.driver[self.num].get(Url)
 
+        SCROLL_PAUSE_TIME = 1
+        # Get scroll height
+        last_height = self.driver[self.num].execute_script("return document.body.scrollHeight")
+        t = 0
+
+        while t <= 2:
+            # Scroll down to bottom
+            self.driver[self.num].execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            # Wait to load page
+            time.sleep(SCROLL_PAUSE_TIME)
+            # Calculate new scroll height and compare with last scroll height
+            new_height = self.driver[self.num].execute_script("return document.body.scrollHeight")
+            last_height = new_height
+            t += 1
+
+        img = []
+        img.clear()
+        try:
+            image1 = self.driver[self.num].find_elements_by_css_selector("a.link--h3bPW > img")
+
+            if image1 == []:
+                raise Exception()
+
+            for num in range(0 , len(image1)):
+                img.append(image1[num].get_attribute("src"))
+            function().download_img(img, self.num)
+            self.driver[self.num].close()
+        except:
+            pass
+        try:
+            image3 = self.driver[self.num].find_elements_by_css_selector("div.VQW0y > img")
+
+            if image3 == []:
+                raise Exception()
+
+            for num in range(0 , len(image3)):
+                img.append(image3[num].get_attribute("src"))
+            function().download_img(img, self.num)
+            self.driver[self.num].close()
+            return
+        except:
+            pass
+
+        try:
+            image2 = self.driver[self.num].find_elements_by_css_selector("a.Link_link__mTUkz > img")
+
+            if image2 == []:
+                raise Exception()
+
+            for num in range(0 , len(image2)):
+                img.append(image2[num].get_attribute("src"))
+            function().download_img(img, self.num)
+            self.driver[self.num].close()
+            return
+        except:
+            pass
+
     
     
 
 
         
-class scraper2(scraper):
-    def __init__(self):
-        self.koUrl = ("https://pixabay.com/ko/", "https://www.pexels.com/ko-kr/")
-        self.enUrl = ("https://pixabay.com/en/", "https://www.pexels.com/en/", "https://unsplash.com/")
+class scraper2():
 
-    def scraping(self,keyword):
-        
-        self.keyword = keyword
+    def scraping(self,keywords):
+        global keyword
+        keyword = keywords
+        self.koUrl = ("https://pixabay.com/ko/images/search/{0}".format(keyword), "https://www.pexels.com/ko-kr/search/{0}".format(keyword))
+        self.enUrl = ("https://pixabay.com/images/search/{0}".format(keyword), "https://www.pexels.com/search/{0}".format(keyword), "https://unsplash.com/s/photos/{0}".format(keyword))
         num = 0
 
         if 'a' <= keyword[0] <= "z" or 'A' <= keyword[0] <='Z':
@@ -87,28 +190,32 @@ class scraper2(scraper):
             scraping = scraper(len(self.enUrl))
 
             for Url in self.enUrl:
-                scraping.english_find(Url, self.keyword,num)
+                scraping.english_find(Url, keyword,num)
                 num = num+1
+
+            print("finish")
+            endTime = time.time() - startTime
+            print(endTime)
 
         else:
 
             scraping = scraper(len(self.koUrl))
             
             for Url in self.koUrl:
-                scraping.korean_find(Url, self.keyword,num)
+                scraping.korean_find(Url, keyword,num)
                 num = num+1
+
+            print("finish")
+            endTime = time.time() - startTime
+            print(endTime)
 
 
     
 
-def test():
+def test(): #테스트 함수
     hello = scraper2()
     hello.scraping("cheese")
 
-test()
-
-
-"""
 imrawling = tkinter.Tk()
 
 imrawling.withdraw
@@ -118,11 +225,11 @@ imrawling.resizable(False,False)
 
 #실행 버튼
 def active_btn():
-    start_scraping = scraper2() #(keyword_entry.get(), int(limit_entry.get()),select_folder.get())
-    start_scraping.scraping(keyword_entry.get())
-
-    compelet = sel.active()
-
+    global limit
+    global startTime
+    limit =  limit_entry.get()
+    startTime = time.time()
+    scraper2().scraping(str(keyword_entry.get()))
 
 #저장 경로 설정
 def select_fold():
@@ -132,6 +239,8 @@ def select_fold():
         return
     select_folder.delete(0, 'end')
     select_folder.insert(0, select_fold)
+    global selected_folder
+    selected_folder = select_folder.get()
 
 title = tkinter.Label(imrawling, text="사진 줍줍",font='Helvetica 20 bold')
 title.place(x=95, y=50)
@@ -169,5 +278,3 @@ select_btn.place(x=420, y=550, height=30,width=60)
 
 
 imrawling.mainloop()
-
-"""
