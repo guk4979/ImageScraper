@@ -20,11 +20,11 @@ import urllib.request
 
 
 
-class function():
+class download():
 
     def download_img(self, image):
         self.image = image
-        self.limit = int(limit)
+        self.limit = limit
 
 
         for num in range(0, self.limit):
@@ -49,7 +49,7 @@ class function():
 
 
 
-class scraper(function):
+class scraper(download):
 
     def __init__(self,num):
 
@@ -73,7 +73,7 @@ class scraper(function):
 
 
 
-    def english_find(self, Url, keyword, num):
+    def imageUrlFind(self, Url, keyword, num):
         self.num = num
 
         keyword = keyword
@@ -119,7 +119,7 @@ class scraper(function):
                 raise Exception()
 
 
-            for num in range(0 , int(limit)):
+            for num in range(0 , limit):
 
                 img.append(image1[num].get_attribute("src"))
 
@@ -139,7 +139,7 @@ class scraper(function):
                 raise Exception()
 
 
-            for num in range(0 , int(limit)):
+            for num in range(0 , limit):
 
                 img.append(image3[num].get_attribute("src"))
 
@@ -160,7 +160,7 @@ class scraper(function):
                 raise Exception()
 
 
-            for num in range(0 , int(limit)):
+            for num in range(0 , limit):
 
                 img.append(image2[num].get_attribute("src"))
 
@@ -170,113 +170,13 @@ class scraper(function):
         except:
             pass
         
-        
-        
-
-    def korean_find(self, Url, keyword, num):
-        self.num = num
-
-        keyword = keyword
-
-        self.driver[self.num].get(Url)
-
-
-        SCROLL_PAUSE_TIME = 1
-
-        # Get scroll height
-
-        last_height = self.driver[self.num].execute_script("return document.body.scrollHeight")
-
-        t = 0
-
-
-        while t <= 2:
-
-            # Scroll down to bottom
-
-            self.driver[self.num].execute_script("window.scrollTo(0, document.body.scrollHeight);")
-
-            # Wait to load page
-
-            time.sleep(SCROLL_PAUSE_TIME)
-
-            # Calculate new scroll height and compare with last scroll height
-
-            new_height = self.driver[self.num].execute_script("return document.body.scrollHeight")
-
-            last_height = new_height
-
-            t += 1
-
-        try:
-
-            image1 = self.driver[self.num].find_elements_by_css_selector("a.link--h3bPW > img")
-
-
-            if image1 == []:
-
-                raise Exception()
-
-
-            for num in range(0 , int(limit)):
-
-                img.append(image1[num].get_attribute("src"))
-
-            self.driver[self.num].close()
-
-        except:
-            pass
-
-        try:
-
-            image3 = self.driver[self.num].find_elements_by_css_selector("div.VQW0y > img")
-
-
-            if image3 == []:
-
-                raise Exception()
-
-
-            for num in range(0 , int(limit)):
-
-                img.append(image3[num].get_attribute("src"))
-
-            self.driver[self.num].close()
-            return
-
-        except:
-            pass
-
-
-        try:
-
-            image2 = self.driver[self.num].find_elements_by_css_selector("a.Link_link__mTUkz > img")
-
-
-            if image2 == []:
-
-                raise Exception()
-
-
-            for num in range(0 , int(limit)):
-
-                img.append(image2[num].get_attribute("src"))
-
-            self.driver[self.num].close()
-            return
-
-        except:
-            pass
-
-    
-    
 
 
         
 class textReader():
 
 
-    def scraping(self,keywords):
+    def textReader(self,keywords):
 
         global keyword
 
@@ -288,38 +188,23 @@ class textReader():
 
         num = 0
 
-        global img
-
-        img = []
-        img.clear()
-
-
         if 'a' <= keyword[0] <= "z" or 'A' <= keyword[0] <='Z':
 
-
-            scraping = scraper(len(self.enUrl))
-
-
-            for Url in self.enUrl:
-
-                scraping.english_find(Url, keyword,num)
-
-                num = num+1
+            
+            URL = self.enUrl
 
         else:
-
-
-            scraping = scraper(len(self.koUrl))
             
+            URL = self.koUrl
 
-            for Url in self.koUrl:
+        textReader = scraper(len(URL))                
+        for Url in URL:
 
-                scraping.korean_find(Url, keyword,num)
+            textReader.imageUrlFind(Url, keyword,num)
 
-                num = num+1
-                
-
-        function().download_img(img)
+            num = num+1
+            
+        download().download_img(img)
 
         print("finish")
 
@@ -335,7 +220,7 @@ def test(): #테스트 함수
 
     hello = textReader()
 
-    hello.scraping("cheese")
+    hello.textReader("cheese")
 
 
 imrawling = tkinter.Tk()
@@ -355,13 +240,16 @@ imrawling.resizable(False,False)
 def active_btn():
 
     global limit
-
+    global img
     global startTime
 
-    limit =  limit_entry.get()
+    limit =  int(limit_entry.get())
+
+    img = []
+    img.clear()
 
     startTime = time.time()
-    textReader().scraping(str(keyword_entry.get()))
+    textReader().textReader(str(keyword_entry.get()))
 
 
 #저장 경로 설정
